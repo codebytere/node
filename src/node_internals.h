@@ -95,6 +95,7 @@ void ResetStdio();  // Safe to call more than once and from signal handlers.
 void SignalExit(int signal, siginfo_t* info, void* ucontext);
 #endif
 
+std::string GetProcessName();
 std::string GetHumanReadableProcessName();
 void GetHumanReadableProcessName(char (*name)[1024]);
 

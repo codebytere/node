@@ -133,6 +133,12 @@ void LowMemoryNotification() {
   }
 }
 
+std::string GetProcessName() {
+  char process_name[512];
+  uv_get_process_title(process_name, sizeof(process_name));
+  return std::string(process_name, sizeof(process_name));
+}
+
 std::string GetHumanReadableProcessName() {
   char name[1024];
   GetHumanReadableProcessName(&name);

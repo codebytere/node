@@ -238,12 +238,8 @@ inline std::string RequiresArgumentErr(const std::string& arg) {
 // handling. In particular, this makes it easier to introduce 'synthetic'
 // arguments that get inserted by expanding option aliases.
 struct ArgsInfo {
-  // Generally, the idea here is that the first entry in `*underlying` stores
-  // the "0th" argument (the program name), then `synthetic_args` are inserted,
-  // followed by the remainder of `*underlying`.
   std::vector<std::string>* underlying;
   std::vector<std::string> synthetic_args;
-
   std::vector<std::string>* exec_args;
 
   ArgsInfo(std::vector<std::string>* args,
@@ -251,15 +247,13 @@ struct ArgsInfo {
     : underlying(args), exec_args(exec_args) {}
 
   size_t remaining() const {
-    // -1 to account for the program name.
-    return underlying->size() - 1 + synthetic_args.size();
+    return underlying->size() + synthetic_args.size();
   }
 
   bool empty() const { return remaining() == 0; }
-  const std::string& program_name() const { return underlying->at(0); }
 
   std::string& first() {
-    return synthetic_args.empty() ? underlying->at(1) : synthetic_args.front();
+    return synthetic_args.empty() ? underlying->at(0) : synthetic_args.front();
   }
 
   std::string pop_first() {
@@ -271,7 +265,7 @@ struct ArgsInfo {
       // which is why we do not include it.
       if (exec_args != nullptr && ret != "--")
         exec_args->push_back(ret);
-      underlying->erase(underlying->begin() + 1);
+      underlying->erase(underlying->begin());
     } else {
       synthetic_args.erase(synthetic_args.begin());
     }
@@ -288,12 +282,6 @@ void OptionsParser<Options>::Parse(
     OptionEnvvarSettings required_env_settings,
     std::vector<std::string>* const errors) const {
   ArgsInfo args(orig_args, exec_args);
-
-  // The first entry is the process name. Make sure it ends up in the V8 argv,
-  // since V8::SetFlagsFromCommandLine() expects that to hold true for that
-  // array as well.
-  if (v8_args->empty())
-    v8_args->push_back(args.program_name());
 
   while (!args.empty() && errors->empty()) {
     if (args.first().size() <= 1 || args.first()[0] != '-') break;

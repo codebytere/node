@@ -681,6 +681,10 @@ int ProcessGlobalArgs(std::vector<std::string>* args,
   // Parse a few arguments which are specific to Node.
   std::vector<std::string> v8_args;
 
+  // V8::SetFlagsFromCommandLine() expects the first argument
+  // to be the process name.
+  v8_args.push_back(GetProcessName());
+
   Mutex::ScopedLock lock(per_process::cli_options_mutex);
   options_parser::Parse(
       args,
@@ -808,8 +812,6 @@ int InitializeNodeWithArgs(std::vector<std::string>* argv,
 
   if (credentials::SafeGetenv("NODE_OPTIONS", &node_options)) {
     std::vector<std::string> env_argv;
-    // [0] is expected to be the program name, fill it in from the real argv.
-    env_argv.push_back(argv->at(0));
 
     bool is_in_string = false;
     bool will_start_new_arg = true;
@@ -948,8 +950,12 @@ InitializationResult InitializeOncePerProcess(int argc, char** argv) {
   // Hack around with the argv pointer. Used for process.title = "blah".
   argv = uv_setup_args(argc, argv);
 
+  // Sanitize the process name out of argv and update argc accordingly.
+  char **args = argv + 1;
+  argc -= 1;
+
   InitializationResult result;
-  result.args = std::vector<std::string>(argv, argv + argc);
+  result.args = std::vector<std::string>(args, args + argc);
   std::vector<std::string> errors;
 
   // This needs to run *before* V8::Initialize().
