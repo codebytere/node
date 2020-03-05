@@ -6066,8 +6066,11 @@ class DSAKeyPairGenerationConfig : public KeyPairGenerationConfig {
     if (EVP_PKEY_paramgen_init(param_ctx.get()) <= 0)
       return nullptr;
 
-    if (EVP_PKEY_CTX_set_dsa_paramgen_bits(param_ctx.get(), modulus_bits_) <= 0)
+    if (EVP_PKEY_CTX_ctrl(param_ctx.get(), EVP_PKEY_DSA, EVP_PKEY_OP_PARAMGEN,
+                            EVP_PKEY_CTRL_DSA_PARAMGEN_BITS, modulus_bits_,
+                            nullptr) <= 0) {
       return nullptr;
+    }
 
     if (divisor_bits_ != -1) {
       if (EVP_PKEY_CTX_ctrl(param_ctx.get(), EVP_PKEY_DSA, EVP_PKEY_OP_PARAMGEN,
