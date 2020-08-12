@@ -224,8 +224,7 @@ Error: foo
 
 #### `await` keyword
 
-With the [`--experimental-repl-await`][] command line option specified,
-experimental support for the `await` keyword is enabled.
+Support for the `await` keyword is enabled by default.
 
 ```console
 > await Promise.resolve(123)
@@ -747,7 +746,6 @@ For an example of running a REPL instance over [curl(1)][], see:
 
 [ZSH]: https://en.wikipedia.org/wiki/Z_shell
 [`'uncaughtException'`]: process.html#process_event_uncaughtexception
-[`--experimental-repl-await`]: cli.html#cli_experimental_repl_await
 [`ERR_DOMAIN_CANNOT_SET_UNCAUGHT_EXCEPTION_CAPTURE`]: errors.html#errors_err_domain_cannot_set_uncaught_exception_capture
 [`ERR_INVALID_REPL_INPUT`]: errors.html#errors_err_invalid_repl_input
 [`domain`]: domain.html
